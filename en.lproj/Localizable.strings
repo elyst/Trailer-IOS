@@ -1,3 +1,5 @@
 "trailerButtonTitle" = "Watch trailer";
 "trailerTitle" = "Trailers";
+"shareTitle" = "Share";
+"urlAPI" = "https://appstubs.triple-it.nl/trailers/?language=en";
 "shareText" = "Hey dude! Check this trailer of ";

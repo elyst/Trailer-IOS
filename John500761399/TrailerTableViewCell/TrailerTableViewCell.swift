@@ -13,9 +13,8 @@ final class TrailerTableViewCell: UITableViewCell {
             movieLabel.text = item?.title
             movieLabel.font = UIFont.boldSystemFont(ofSize: 16.0)
             movieText.text = item?.description
-            if let imageURLString = item?.posterImage {
-                let url = URL(string: imageURLString)
-                movieImage.kf.setImage(with: url!)
+            if (item?.posterImage) != nil {
+                movieImage.kf.setImage(with: item?.posterImage)
             }
         }
     }

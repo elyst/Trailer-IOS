@@ -1,6 +1,8 @@
 import UIKit
 import Alamofire
 
+var vSpinner : UIView?
+
 class ViewController: UIViewController {
 
     @IBOutlet weak var tableView: UITableView!
@@ -16,8 +18,9 @@ class ViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        title = "Trailers"
+        title = NSLocalizedString("trailerTitle", comment:"")
         navigationController?.navigationBar.prefersLargeTitles = true
+        self.showSpinner(onView: self.view)
         setupRefreshControl()
         setupTableView()
         getData()
@@ -39,7 +42,8 @@ class ViewController: UIViewController {
     }
     
     func getData() {
-        Alamofire.request("https://appstubs.triple-it.nl/trailers/")
+        let url = NSLocalizedString("urlAPI", comment:"")
+        Alamofire.request(url)
             .responseData(completionHandler: { [weak self] (response) in
                 guard let jsonData = response.data else { return }
                 
@@ -47,6 +51,8 @@ class ViewController: UIViewController {
                 let movieObjectsFromBackend = try? decoder.decode([MovieObject].self, from: jsonData)
                 
                 self?.movieObjects = movieObjectsFromBackend
+                self?.removeSpinner()
+            
             })
     }
 }
@@ -69,8 +75,34 @@ extension ViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let trailerDetailVc = storyboard.instantiateViewController(withIdentifier:
-            "TrailerDetailViewController")
+            "TrailerDetailViewController") as! TrailerViewController
+        
+        trailerDetailVc.movieObject = movieObjects?[indexPath.row]
         self.navigationController?.pushViewController(trailerDetailVc, animated: true)
+    }
+}
+
+extension UIViewController {
+    func showSpinner(onView : UIView) {
+        let spinnerView = UIView.init(frame: onView.bounds)
+        spinnerView.backgroundColor = UIColor.init(red: 0.5, green: 0.5, blue: 0.5, alpha: 0.5)
+        let ai = UIActivityIndicatorView.init(style: .whiteLarge)
+        ai.startAnimating()
+        ai.center = spinnerView.center
+        
+        DispatchQueue.main.async {
+            spinnerView.addSubview(ai)
+            onView.addSubview(spinnerView)
+        }
+        
+        vSpinner = spinnerView
+    }
+    
+    func removeSpinner() {
+        DispatchQueue.main.async {
+            vSpinner?.removeFromSuperview()
+            vSpinner = nil
+        }
     }
 }
 
